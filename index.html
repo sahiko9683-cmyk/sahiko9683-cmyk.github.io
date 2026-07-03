@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="ko" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Biju Cha | 바이브코더 & 업무 자동화 개발자</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%236c63ff'/><text x='16' y='23' font-family='Arial,sans-serif' font-size='19' font-weight='800' fill='white' text-anchor='middle'>B</text></svg>">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0a0a1a;
+      --bg2:       #0f0f24;
+      --bg3:       #13132e;
+      --accent:    #6c63ff;
+      --accent2:   #a78bfa;
+      --text:      #e8e8e8;
+      --muted:     #888aaa;
+      --card:      #12122a;
+      --border:    #2a2a4a;
+      --radius:    12px;
+      --nav-h:     70px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      overflow-x: hidden;
+      word-break: keep-all;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg2); }
+    ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      background: rgba(10, 10, 26, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 6%;
+    }
+
+    .nav-logo {
+      font-size: 1.35rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+      flex-shrink: 0;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .nav-menu {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-menu a {
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: var(--muted);
+      transition: color 0.25s;
+      position: relative;
+    }
+
+    .nav-menu a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0;
+      width: 0; height: 2px;
+      background: var(--accent);
+      border-radius: 2px;
+      transition: width 0.3s;
+    }
+
+    .nav-menu a:hover { color: var(--text); }
+    .nav-menu a:hover::after { width: 100%; }
+
+    /* ── LANG TOGGLE ── */
+    .lang-toggle { position: relative; }
+
+    .lang-btn {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 14px;
+      background: rgba(108,99,255,0.1);
+      border: 1px solid rgba(108,99,255,0.3);
+      border-radius: 20px;
+      color: var(--accent2);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 36px;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+
+    .lang-btn:hover,
+    .lang-btn[aria-expanded="true"] {
+      background: rgba(108,99,255,0.22);
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .lang-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      min-width: 158px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.55);
+      z-index: 2000;
+      overflow: hidden;
+    }
+
+    .lang-dropdown.open { display: block; }
+
+    .lang-dropdown button {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 0.88rem;
+      color: var(--muted);
+      background: none;
+      border: none;
+      border-left: 3px solid transparent;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+      text-align: left;
+    }
+
+    .lang-dropdown button:hover {
+      background: rgba(108,99,255,0.08);
+      color: var(--text);
+    }
+
+    .lang-dropdown button.active {
+      border-left-color: var(--accent);
+      color: var(--accent2);
+      background: rgba(108,99,255,0.1);
+    }
+
+    /* ── HAMBURGER ── */
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      min-height: 44px;
+      min-width: 44px;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .nav-hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+
+    .nav-hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-hamburger.active span:nth-child(2) { opacity: 0; }
+    .nav-hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: var(--nav-h) 6% 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(108,99,255,0.18) 0%, transparent 60%),
+        linear-gradient(135deg, #0a0a1a 0%, #1a1040 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #hero::before {
+      content: '';
+      position: absolute;
+      width: 700px; height: 700px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(108,99,255,0.08) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(108,99,255,0.15);
+      border: 1px solid rgba(108,99,255,0.4);
+      color: var(--accent2);
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 5px 16px;
+      border-radius: 20px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero-name {
+      font-size: clamp(3rem, 8vw, 5.5rem);
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1.1;
+      background: linear-gradient(135deg, #fff 30%, var(--accent2) 70%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: fadeUp 0.7s ease 0.1s both;
+    }
+
+    .hero-title {
+      font-size: clamp(1.1rem, 3vw, 1.6rem);
+      font-weight: 600;
+      color: var(--accent);
+      margin-top: 0.6rem;
+      animation: fadeUp 0.7s ease 0.2s both;
+      min-height: 2rem;
+    }
+
+    .hero-title::after {
+      content: '|';
+      color: var(--accent2);
+      animation: blink 0.75s step-end infinite;
+      margin-left: 2px;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .hero-desc {
+      font-size: clamp(0.95rem, 2vw, 1.15rem);
+      color: var(--muted);
+      margin-top: 1rem;
+      max-width: 520px;
+      animation: fadeUp 0.7s ease 0.3s both;
+    }
+
+    .hero-cta {
+      margin-top: 2.5rem;
+      animation: fadeUp 0.7s ease 0.4s both;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 34px;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.25s, box-shadow 0.25s;
+      box-shadow: 0 4px 24px rgba(108,99,255,0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 32px rgba(108,99,255,0.55);
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      animation: bounce 2s infinite;
+    }
+
+    .scroll-hint span { width: 24px; height: 38px; border: 2px solid var(--border); border-radius: 12px; display: flex; align-items: flex-start; justify-content: center; padding-top: 6px; }
+    .scroll-hint span::before { content: ''; width: 4px; height: 8px; background: var(--accent); border-radius: 2px; animation: scrollDot 1.6s infinite; }
+
+    /* ── 공통 섹션 ── */
+    section { padding: 80px 6%; }
+
+    .section-label {
+      display: inline-block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(108,99,255,0.1);
+      border: 1px solid rgba(108,99,255,0.25);
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+
+    .section-title span {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .section-sub {
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 520px;
+      margin-bottom: 3rem;
+    }
+
+    /* ── ABOUT ── */
+    #about { background: var(--bg2); }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 5rem;
+      align-items: center;
+    }
+
+    .about-visual { display: flex; justify-content: center; }
+
+    .avatar-wrapper { position: relative; width: 260px; height: 260px; }
+
+    .avatar-ring {
+      position: absolute;
+      inset: -10px;
+      border-radius: 50%;
+      background: conic-gradient(var(--accent), var(--accent2), transparent, var(--accent));
+      animation: spin 6s linear infinite;
+    }
+
+    .avatar-inner {
+      position: relative;
+      width: 260px; height: 260px;
+      border-radius: 50%;
+      background: var(--bg3);
+      border: 4px solid var(--bg2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 6rem;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .about-text h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1.2rem; }
+
+    .about-text p {
+      color: var(--muted);
+      margin-bottom: 1rem;
+      font-size: 0.97rem;
+      line-height: 1.8;
+    }
+
+    .about-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 1.8rem; }
+
+    .tag {
+      background: rgba(108,99,255,0.12);
+      border: 1px solid rgba(108,99,255,0.28);
+      color: var(--accent2);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.84rem;
+      font-weight: 500;
+    }
+
+    /* ── SKILLS ── */
+    #skills { background: var(--bg); }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.8rem;
+    }
+
+    .skill-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.4rem 1.6rem;
+      transition: border-color 0.25s, transform 0.25s;
+    }
+
+    .skill-item:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+    .skill-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; }
+
+    .skill-name { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.95rem; }
+
+    .skill-icon { font-size: 1.3rem; }
+
+    .skill-pct { font-size: 0.82rem; color: var(--accent2); font-weight: 700; }
+
+    .progress-track { width: 100%; height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 3px;
+      width: 0;
+      transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ── PROJECTS ── */
+    #projects { background: var(--bg2); }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.8rem;
+    }
+
+    .project-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    }
+
+    .project-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-5px);
+      box-shadow: 0 16px 48px rgba(108,99,255,0.2);
+    }
+
+    .project-icon {
+      font-size: 2.2rem;
+      width: 56px; height: 56px;
+      background: rgba(108,99,255,0.1);
+      border: 1px solid rgba(108,99,255,0.2);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .project-title { font-size: 1.1rem; font-weight: 700; line-height: 1.3; }
+
+    .project-desc { color: var(--muted); font-size: 0.88rem; line-height: 1.7; flex: 1; }
+
+    .project-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+
+    .project-tag {
+      background: rgba(108,99,255,0.1);
+      border: 1px solid rgba(108,99,255,0.2);
+      color: var(--accent2);
+      padding: 3px 12px;
+      border-radius: 12px;
+      font-size: 0.78rem;
+      font-weight: 500;
+    }
+
+    .project-tag.internal {
+      background: rgba(251,146,60,0.12);
+      border-color: rgba(251,146,60,0.35);
+      color: #fb923c;
+    }
+
+    .project-links { display: flex; flex-wrap: wrap; gap: 4px 20px; }
+
+    .project-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--accent);
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-top: 0.3rem;
+      transition: gap 0.2s;
+    }
+
+    .project-link:hover { gap: 10px; }
+
+    /* ── CONTACT ── */
+    #contact { background: var(--bg); }
+
+    .contact-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 5rem;
+      align-items: start;
+    }
+
+    .contact-info h3 { font-size: 1.4rem; font-weight: 700; margin-bottom: 1rem; }
+
+    .contact-info p { color: var(--muted); font-size: 0.95rem; line-height: 1.8; margin-bottom: 2rem; }
+
+    .contact-links { display: flex; flex-direction: column; gap: 1rem; }
+
+    .contact-link {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: border-color 0.25s, transform 0.25s;
+      font-size: 0.92rem;
+    }
+
+    .contact-link:hover { border-color: var(--accent); transform: translateX(4px); color: var(--accent2); }
+
+    .contact-link-icon {
+      font-size: 1.3rem;
+      width: 40px; height: 40px;
+      background: rgba(108,99,255,0.1);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .contact-link-text span { display: block; font-size: 0.75rem; color: var(--muted); font-weight: 400; }
+
+    .contact-form { display: flex; flex-direction: column; gap: 1.2rem; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+
+    .form-group label { font-size: 0.82rem; font-weight: 600; color: var(--muted); letter-spacing: 0.5px; }
+
+    .form-group input,
+    .form-group textarea {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.93rem;
+      padding: 12px 16px;
+      outline: none;
+      transition: border-color 0.25s, box-shadow 0.25s;
+      resize: none;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(108,99,255,0.15);
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: #44446a; }
+
+    .btn-send {
+      padding: 13px 32px;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      align-self: flex-start;
+      transition: transform 0.25s, box-shadow 0.25s;
+      box-shadow: 0 4px 18px rgba(108,99,255,0.35);
+      font-family: inherit;
+    }
+
+    .btn-send:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(108,99,255,0.5); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--bg3);
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 2.5rem 6%;
+    }
+
+    .footer-logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    footer p { color: var(--muted); font-size: 0.84rem; }
+    footer p span { color: var(--accent); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    @keyframes scrollDot {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(12px); opacity: 0; }
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    img { max-width: 100%; height: auto; }
+
+    .btn-primary, .btn-send, .nav-menu a,
+    .contact-link, .project-link { min-height: 44px; }
+
+    /* ── SR-ONLY ── */
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* ── 모바일 (< 768px) ── */
+    @media (max-width: 767px) {
+      nav { padding: 0 5%; }
+
+      .nav-right { gap: 0.5rem; }
+
+      .nav-hamburger { display: flex; }
+
+      .lang-current { display: none; }
+      .lang-btn { padding: 7px 10px; }
+
+      .nav-menu {
+        display: none;
+        position: absolute;
+        top: var(--nav-h);
+        left: 0; right: 0;
+        background: rgba(10,10,26,0.97);
+        backdrop-filter: blur(10px);
+        flex-direction: column;
+        padding: 0.5rem 6%;
+        border-bottom: 1px solid var(--border);
+        gap: 0;
+      }
+
+      .nav-menu.open { display: flex; }
+
+      .nav-menu li { border-bottom: 1px solid rgba(255,255,255,0.06); }
+      .nav-menu a { display: flex; align-items: center; padding: 14px 0; font-size: 1rem; color: var(--text); }
+      .nav-menu a::after { display: none; }
+
+      .hero-name { font-size: clamp(28px, 6vw, 48px) !important; }
+
+      .btn-primary { width: 100%; justify-content: center; }
+
+      .project-card { padding: 16px; }
+
+      .about-grid,
+      .contact-wrapper { grid-template-columns: 1fr; gap: 2.5rem; }
+      .about-visual { order: -1; }
+      .form-row { grid-template-columns: 1fr; }
+      .skills-grid,
+      .projects-grid { grid-template-columns: 1fr; }
+
+      section { padding: 60px 5%; }
+
+      .avatar-wrapper,
+      .avatar-inner { width: 200px; height: 200px; }
+      .avatar-inner { font-size: 4.5rem; }
+
+      .lang-dropdown { right: 0; }
+    }
+
+    /* ── 태블릿 (768px+) ── */
+    @media (min-width: 768px) {
+      .nav-hamburger { display: none; }
+      .nav-menu { display: flex; }
+      .skills-grid { grid-template-columns: repeat(2, 1fr); }
+      .projects-grid { grid-template-columns: repeat(2, 1fr); }
+      .about-grid { grid-template-columns: 1fr 1.4fr; gap: 4rem; }
+      .contact-wrapper { grid-template-columns: 1fr 1.4fr; gap: 4rem; }
+    }
+
+    /* ── 데스크톱 (1024px+) ── */
+    @media (min-width: 1024px) {
+      .skills-grid { grid-template-columns: repeat(3, 1fr); }
+      .projects-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (min-width: 1200px) {
+      nav  { padding: 0 max(6%, calc((100% - 1200px) / 2)); }
+      section { padding: 80px max(6%, calc((100% - 1200px) / 2)); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 스크린리더 언어 변경 알림 -->
+  <div id="lang-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- ── NAVIGATION ── -->
+  <nav>
+    <a href="#hero" class="nav-logo">Biju Cha</a>
+    <div class="nav-right">
+      <ul class="nav-menu">
+        <li><a href="#about" data-i18n="nav.about">About</a></li>
+        <li><a href="#skills" data-i18n="nav.skills">Skills</a></li>
+        <li><a href="#projects" data-i18n="nav.projects">Projects</a></li>
+        <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
+      </ul>
+
+      <!-- 언어 토글: 한국어/영어 -->
+      <div class="lang-toggle">
+        <button class="lang-btn"
+                aria-haspopup="listbox"
+                aria-expanded="false"
+                aria-label="언어 선택. 현재: 한국어">
+          🌐 <span class="lang-current">한국어</span>
+        </button>
+        <div class="lang-dropdown" role="listbox" aria-label="언어 선택">
+          <button data-lang="ko" role="option" aria-selected="true" class="active">🇰🇷 한국어</button>
+          <button data-lang="en" role="option" aria-selected="false">🇺🇸 English</button>
+        </div>
+      </div>
+
+      <button class="nav-hamburger" aria-label="메뉴 열기" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section id="hero">
+    <div class="hero-badge" data-i18n="hero.badge">✦ 바이브코더 & 업무 자동화 개발자</div>
+    <h1 class="hero-name">Biju Cha</h1>
+    <p class="hero-title" id="typing-title"></p>
+    <p class="hero-desc" data-i18n="hero.desc">일상의 불편을 동작하는 소프트웨어로 바꿉니다. AI와 함께 만들고, 실제 서비스로 배포해 24시간 운영합니다.</p>
+    <div class="hero-cta">
+      <a href="#projects" class="btn-primary">
+        <span data-i18n="hero.cta">프로젝트 보기</span>
+        <span aria-hidden="true">↓</span>
+      </a>
+    </div>
+    <div class="scroll-hint">
+      <span data-i18n="hero.scroll">스크롤</span>
+      <span></span>
+    </div>
+  </section>
+
+  <!-- ── ABOUT ── -->
+  <section id="about">
+    <div class="about-grid">
+      <div class="about-visual">
+        <div class="avatar-wrapper">
+          <div class="avatar-ring"></div>
+          <div class="avatar-inner">👨‍💻</div>
+        </div>
+      </div>
+      <div class="about-text reveal">
+        <div class="section-label" data-i18n="about.label">About Me</div>
+        <h2 class="section-title" data-i18n-html="about.title">안녕하세요,<br/><span>Biju Cha</span>입니다</h2>
+        <p data-i18n="about.p1">AI와 함께 실제로 필요한 도구를 직접 만드는 풀스택 바이브코더입니다.</p>
+        <p data-i18n="about.p2">불편한 것을 발견하면 자동화하고, 반복 작업은 코드로 없앱니다. 제가 만든 도구 여러 개가 실제 사무실에서 매일 쓰이고 있습니다.</p>
+        <p data-i18n="about.p3">Python, JavaScript, TypeScript를 기반으로 AI 프롬프팅을 더해, 아이디어를 배포된 실제 서비스까지 빠르게 구현합니다.</p>
+        <div class="about-tags">
+          <span class="tag" data-i18n="about.tag1">🤖 AI 활용</span>
+          <span class="tag" data-i18n="about.tag2">⚡ 업무 자동화</span>
+          <span class="tag" data-i18n="about.tag3">🌐 풀스택 개발</span>
+          <span class="tag" data-i18n="about.tag4">♿ 접근성 우선</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SKILLS ── -->
+  <section id="skills">
+    <div class="reveal" style="text-align:center; max-width:600px; margin:0 auto 3rem;">
+      <div class="section-label" data-i18n="skills.label">Tech Stack</div>
+      <h2 class="section-title" data-i18n-html="skills.title">사용하는 <span>기술 스택</span></h2>
+      <p class="section-sub" data-i18n="skills.sub">다양한 도구를 조합해 아이디어를 빠르게 현실로 구현합니다.</p>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-item reveal">
+        <div class="skill-header">
+          <div class="skill-name"><span class="skill-icon">🐍</span> <span data-i18n="skill.python">Python / Flask</span></div>
+          <span class="skill-pct">65%</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" data-width="65"></div></div>
+      </div>
+      <div class="skill-item reveal">
+        <div class="skill-header">
+          <div class="skill-name"><span class="skill-icon">⚡</span> <span data-i18n="skill.js">JavaScript / TypeScript</span></div>
+          <span class="skill-pct">60%</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" data-width="60"></div></div>
+      </div>
+      <div class="skill-item reveal">
+        <div class="skill-header">
+          <div class="skill-name"><span class="skill-icon">⚛️</span> <span data-i18n="skill.react">React / Next.js</span></div>
+          <span class="skill-pct">55%</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" data-width="55"></div></div>
+      </div>
+      <div class="skill-item reveal">
+        <div class="skill-header">
+          <div class="skill-name"><span class="skill-icon">🗄️</span> <span data-i18n="skill.node">Node.js / Express / SQL</span></div>
+          <span class="skill-pct">55%</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" data-width="55"></div></div>
+      </div>
+      <div class="skill-item reveal">
+        <div class="skill-header">
+          <div class="skill-name"><span class="skill-icon">🚂</span> <span data-i18n="skill.deploy">배포 (Railway / CI)</span></div>
+          <span class="skill-pct">70%</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" data-width="70"></div></div>
+      </div>
+      <div class="skill-item reveal">
+        <div class="skill-header">
+          <div class="skill-name"><span class="skill-icon">🤖</span> <span data-i18n="skill.ai">AI 프롬프팅</span></div>
+          <span class="skill-pct">95%</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" data-width="95"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PROJECTS ── -->
+  <section id="projects">
+    <div class="reveal" style="text-align:center; max-width:600px; margin:0 auto 3rem;">
+      <div class="section-label" data-i18n="projects.label">Portfolio</div>
+      <h2 class="section-title" data-i18n-html="projects.title">주요 <span>프로젝트</span></h2>
+      <p class="section-sub" data-i18n="projects.sub">아이디어를 실제 배포·운영까지 이어간 결과물들입니다.</p>
+    </div>
+    <div class="projects-grid">
+
+      <article class="project-card reveal">
+        <div class="project-icon" aria-hidden="true">🩺</div>
+        <h3 class="project-title" data-i18n="p1.title">Fasih Surgical — B2B 랜딩 & 리드 관리</h3>
+        <p class="project-desc" data-i18n="p1.desc">치과·수술 기구 수입/유통 기업을 위한 실제 운영 중인 B2B 웹사이트입니다. 영/한 이중 언어 랜딩 페이지, 17종 제품 카탈로그, 문의 폼으로 들어온 리드를 서버에 저장하고 비밀번호로 보호된 관리자 페이지에서 관리합니다. 프론트엔드는 React 18 + Vite + TypeScript + Tailwind, 백엔드는 Express 5 + SQLite에 CSRF·스팸 방지를 적용했고, Railway에 영속 볼륨과 함께 배포해 전 구간 검증을 마쳤습니다.</p>
+        <div class="project-tags">
+          <span class="project-tag">React</span>
+          <span class="project-tag">TypeScript</span>
+          <span class="project-tag">Express</span>
+          <span class="project-tag">SQLite</span>
+          <span class="project-tag">Railway</span>
+        </div>
+        <div class="project-links">
+          <a href="https://fasih-surgical-production.up.railway.app" target="_blank" rel="noopener" class="project-link" data-i18n="link.site">사이트 방문 →</a>
+          <a href="https://github.com/sahiko9683-cmyk/fasih-surgical" target="_blank" rel="noopener" class="project-link" data-i18n="link.code">GitHub 코드 보기 →</a>
+        </div>
+      </article>
+
+      <article class="project-card reveal">
+        <div class="project-icon" aria-hidden="true">🎲</div>
+        <h3 class="project-title" data-i18n="p2.title">Dice Pattern Recorder</h3>
+        <p class="project-desc" data-i18n="p2.desc">스크린리더만으로 완전히 사용할 수 있도록 설계한 접근성 우선 웹앱입니다. 주사위 게임 세션을 기록·집계하고, 통계를 숫자 대신 자연어 전략 제안 문장으로 알려줍니다. Claude API 기반 자연어 입력 해석, CSV/TXT 내보내기, 비시각 피드백용 이중 aria-live 리전을 갖췄습니다. Next.js 16 + TypeScript와 Prisma ORM + MySQL 8로 만들었고, Railway에 GitHub 자동 배포로 운영 중입니다.</p>
+        <div class="project-tags">
+          <span class="project-tag">Next.js</span>
+          <span class="project-tag">TypeScript</span>
+          <span class="project-tag">Prisma</span>
+          <span class="project-tag">MySQL</span>
+          <span class="project-tag">Railway</span>
+        </div>
+        <div class="project-links">
+          <a href="https://dicegame.up.railway.app" target="_blank" rel="noopener" class="project-link" data-i18n="link.site">사이트 방문 →</a>
+          <a href="https://github.com/sahiko9683-cmyk/dice-pattern-recorder" target="_blank" rel="noopener" class="project-link" data-i18n="link.code">GitHub 코드 보기 →</a>
+        </div>
+      </article>
+
+      <article class="project-card reveal">
+        <div class="project-icon" aria-hidden="true">📰</div>
+        <h3 class="project-title" data-i18n="p3.title">뉴스 스크랩 자동화</h3>
+        <p class="project-desc" data-i18n="p3.desc">매일 포털 뉴스를 수작업으로 검색해 엑셀 보고서를 만들던 사무실 업무를 없앤 Flask 웹 도구입니다. RSS와 스크래핑으로 24시간 내 키워드 기사를 수집하고, 본문을 추출한 뒤 텍스트 유사도 분석으로 중복 기사를 걸러, 정리된 엑셀 파일과 바로 보낼 수 있는 업무보고 텍스트를 출력합니다. 자동 테스트와 CI를 갖췄고, 실제 사무실에서 매일 사용 중입니다.</p>
+        <div class="project-tags">
+          <span class="project-tag">Python</span>
+          <span class="project-tag">Flask</span>
+          <span class="project-tag">BeautifulSoup</span>
+          <span class="project-tag">scikit-learn</span>
+          <span class="project-tag internal" data-i18n="tag.internal">내부 도구 — 코드 비공개</span>
+        </div>
+      </article>
+
+      <article class="project-card reveal">
+        <div class="project-icon" aria-hidden="true">⏰</div>
+        <h3 class="project-title" data-i18n="p4.title">업무 스케줄러</h3>
+        <p class="project-desc" data-i18n="p4.desc">정해진 시간 창 안에서 무작위 시각에 반복 웹 업무를 자동 실행하는 개인용 스케줄러입니다. 주말과 한국 공휴일은 자동으로 건너뛰고, 마스터 온/오프 스위치와 웹 상태 대시보드를 갖췄습니다. Flask + APScheduler가 Playwright 브라우저 자동화를 구동하며 Railway에서 24시간 운영 중입니다. 시간대·공휴일 같은 엣지케이스에 강한 무인 자동화를 만드는 경험을 쌓았습니다.</p>
+        <div class="project-tags">
+          <span class="project-tag">Python</span>
+          <span class="project-tag">APScheduler</span>
+          <span class="project-tag">Playwright</span>
+          <span class="project-tag">Railway</span>
+          <span class="project-tag internal" data-i18n="tag.internal">내부 도구 — 코드 비공개</span>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ── CONTACT ── -->
+  <section id="contact">
+    <div class="contact-wrapper">
+      <div class="reveal">
+        <div class="section-label" data-i18n="contact.label">Contact</div>
+        <h2 class="section-title" data-i18n-html="contact.title">함께 <span>만들어요</span></h2>
+        <div class="contact-info">
+          <p data-i18n="contact.p">프로젝트 협업, 아이디어 공유, 질문 무엇이든 환영합니다. 편하게 연락 주세요!</p>
+          <div class="contact-links">
+            <a href="mailto:sahiko9683@gmail.com" class="contact-link">
+              <div class="contact-link-icon" aria-hidden="true">📧</div>
+              <div class="contact-link-text">
+                sahiko9683@gmail.com
+                <span data-i18n="contact.email">이메일로 연락하기</span>
+              </div>
+            </a>
+            <a href="https://github.com/sahiko9683-cmyk" target="_blank" rel="noopener" class="contact-link">
+              <div class="contact-link-icon" aria-hidden="true">🐙</div>
+              <div class="contact-link-text">
+                github.com/sahiko9683-cmyk
+                <span data-i18n="contact.github">GitHub 프로필 보기</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <form class="contact-form reveal" onsubmit="handleSubmit(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name" data-i18n="form.name">이름</label>
+            <input type="text" id="name" data-i18n-ph="form.name.ph" placeholder="홍길동" required />
+          </div>
+          <div class="form-group">
+            <label for="email" data-i18n="form.email">이메일</label>
+            <input type="email" id="email" placeholder="hello@example.com" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="message" data-i18n="form.msg">메시지</label>
+          <textarea id="message" rows="6" data-i18n-ph="form.msg.ph" placeholder="안녕하세요, 협업을 제안드리고 싶습니다..." required></textarea>
+        </div>
+        <button type="submit" class="btn-send" data-i18n="form.send">메시지 보내기 ✉</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <p class="footer-logo">Biju Cha</p>
+    <p data-i18n-html="footer">© 2026 Biju Cha. Made with <span>♥</span> and AI.</p>
+  </footer>
+
+  <script>
+    /* ── 번역 데이터 (한국어/영어) ── */
+    const i18n = {
+      ko: {
+        'nav.about': 'About', 'nav.skills': 'Skills', 'nav.projects': 'Projects', 'nav.contact': 'Contact',
+        'hero.badge': '✦ 바이브코더 & 업무 자동화 개발자',
+        'hero.desc': '일상의 불편을 동작하는 소프트웨어로 바꿉니다. AI와 함께 만들고, 실제 서비스로 배포해 24시간 운영합니다.',
+        'hero.cta': '프로젝트 보기', 'hero.scroll': '스크롤',
+        'hero.typing': ['바이브코더', '업무 자동화 개발자', '풀스택 빌더'],
+        'about.label': 'About Me',
+        'about.title': '안녕하세요,<br/><span>Biju Cha</span>입니다',
+        'about.p1': 'AI와 함께 실제로 필요한 도구를 직접 만드는 풀스택 바이브코더입니다.',
+        'about.p2': '불편한 것을 발견하면 자동화하고, 반복 작업은 코드로 없앱니다. 제가 만든 도구 여러 개가 실제 사무실에서 매일 쓰이고 있습니다.',
+        'about.p3': 'Python, JavaScript, TypeScript를 기반으로 AI 프롬프팅을 더해, 아이디어를 배포된 실제 서비스까지 빠르게 구현합니다.',
+        'about.tag1': '🤖 AI 활용', 'about.tag2': '⚡ 업무 자동화', 'about.tag3': '🌐 풀스택 개발', 'about.tag4': '♿ 접근성 우선',
+        'skills.label': 'Tech Stack', 'skills.title': '사용하는 <span>기술 스택</span>',
+        'skills.sub': '다양한 도구를 조합해 아이디어를 빠르게 현실로 구현합니다.',
+        'skill.python': 'Python / Flask', 'skill.js': 'JavaScript / TypeScript', 'skill.react': 'React / Next.js',
+        'skill.node': 'Node.js / Express / SQL', 'skill.deploy': '배포 (Railway / CI)', 'skill.ai': 'AI 프롬프팅',
+        'projects.label': 'Portfolio', 'projects.title': '주요 <span>프로젝트</span>',
+        'projects.sub': '아이디어를 실제 배포·운영까지 이어간 결과물들입니다.',
+        'p1.title': 'Fasih Surgical — B2B 랜딩 & 리드 관리',
+        'p1.desc': '치과·수술 기구 수입/유통 기업을 위한 실제 운영 중인 B2B 웹사이트입니다. 영/한 이중 언어 랜딩 페이지, 17종 제품 카탈로그, 문의 폼으로 들어온 리드를 서버에 저장하고 비밀번호로 보호된 관리자 페이지에서 관리합니다. 프론트엔드는 React 18 + Vite + TypeScript + Tailwind, 백엔드는 Express 5 + SQLite에 CSRF·스팸 방지를 적용했고, Railway에 영속 볼륨과 함께 배포해 전 구간 검증을 마쳤습니다.',
+        'p2.title': 'Dice Pattern Recorder',
+        'p2.desc': '스크린리더만으로 완전히 사용할 수 있도록 설계한 접근성 우선 웹앱입니다. 주사위 게임 세션을 기록·집계하고, 통계를 숫자 대신 자연어 전략 제안 문장으로 알려줍니다. Claude API 기반 자연어 입력 해석, CSV/TXT 내보내기, 비시각 피드백용 이중 aria-live 리전을 갖췄습니다. Next.js 16 + TypeScript와 Prisma ORM + MySQL 8로 만들었고, Railway에 GitHub 자동 배포로 운영 중입니다.',
+        'p3.title': '뉴스 스크랩 자동화',
+        'p3.desc': '매일 포털 뉴스를 수작업으로 검색해 엑셀 보고서를 만들던 사무실 업무를 없앤 Flask 웹 도구입니다. RSS와 스크래핑으로 24시간 내 키워드 기사를 수집하고, 본문을 추출한 뒤 텍스트 유사도 분석으로 중복 기사를 걸러, 정리된 엑셀 파일과 바로 보낼 수 있는 업무보고 텍스트를 출력합니다. 자동 테스트와 CI를 갖췄고, 실제 사무실에서 매일 사용 중입니다.',
+        'p4.title': '업무 스케줄러',
+        'p4.desc': '정해진 시간 창 안에서 무작위 시각에 반복 웹 업무를 자동 실행하는 개인용 스케줄러입니다. 주말과 한국 공휴일은 자동으로 건너뛰고, 마스터 온/오프 스위치와 웹 상태 대시보드를 갖췄습니다. Flask + APScheduler가 Playwright 브라우저 자동화를 구동하며 Railway에서 24시간 운영 중입니다. 시간대·공휴일 같은 엣지케이스에 강한 무인 자동화를 만드는 경험을 쌓았습니다.',
+        'link.site': '사이트 방문 →', 'link.code': 'GitHub 코드 보기 →',
+        'tag.internal': '내부 도구 — 코드 비공개',
+        'contact.label': 'Contact', 'contact.title': '함께 <span>만들어요</span>',
+        'contact.p': '프로젝트 협업, 아이디어 공유, 질문 무엇이든 환영합니다. 편하게 연락 주세요!',
+        'contact.email': '이메일로 연락하기', 'contact.github': 'GitHub 프로필 보기',
+        'form.name': '이름', 'form.name.ph': '홍길동',
+        'form.email': '이메일',
+        'form.msg': '메시지', 'form.msg.ph': '안녕하세요, 협업을 제안드리고 싶습니다...',
+        'form.send': '메시지 보내기 ✉', 'form.sent': '전송 완료! ✓',
+        'footer': '© 2026 Biju Cha. Made with <span>♥</span> and AI.',
+        'lang.name': '한국어', 'lang.changed': '언어가 한국어로 변경되었습니다.', 'lang.aria': '언어 선택. 현재: 한국어',
+      },
+      en: {
+        'nav.about': 'About', 'nav.skills': 'Skills', 'nav.projects': 'Projects', 'nav.contact': 'Contact',
+        'hero.badge': '✦ Vibe Coder & Workflow Automation Developer',
+        'hero.desc': 'I turn everyday friction into working software — building with AI and shipping real services that run 24/7 in production.',
+        'hero.cta': 'View Projects', 'hero.scroll': 'Scroll',
+        'hero.typing': ['Vibe Coder', 'Automation Developer', 'Full-Stack Builder'],
+        'about.label': 'About Me',
+        'about.title': 'Hello,<br/>I\'m <span>Biju Cha</span>',
+        'about.p1': 'A full-stack vibe coder who builds real tools with AI.',
+        'about.p2': 'When I spot friction, I automate it. Repetitive tasks become code — and several of my tools are used every day in a real office.',
+        'about.p3': 'Using Python, JavaScript and TypeScript, enhanced with AI prompting, I take ideas from zero to deployed, production services fast.',
+        'about.tag1': '🤖 AI Utilization', 'about.tag2': '⚡ Workflow Automation', 'about.tag3': '🌐 Full-Stack Dev', 'about.tag4': '♿ Accessibility-First',
+        'skills.label': 'Tech Stack', 'skills.title': 'My <span>Tech Stack</span>',
+        'skills.sub': 'I combine various tools to bring ideas to life quickly.',
+        'skill.python': 'Python / Flask', 'skill.js': 'JavaScript / TypeScript', 'skill.react': 'React / Next.js',
+        'skill.node': 'Node.js / Express / SQL', 'skill.deploy': 'Deployment (Railway / CI)', 'skill.ai': 'AI Prompting',
+        'projects.label': 'Portfolio', 'projects.title': 'Featured <span>Projects</span>',
+        'projects.sub': 'Real services taken all the way from idea to deployment and daily operation.',
+        'p1.title': 'Fasih Surgical — B2B Landing & Lead Management',
+        'p1.desc': 'A production B2B website for a dental & surgical instrument import/distribution business: landing pages with EN/KO internationalization, a 17-item product catalog, and an inquiry form whose leads are stored server-side and managed through a password-protected admin dashboard. The front-end is React 18 + Vite + TypeScript + Tailwind; the back-end is Express 5 with SQLite, CSRF protection and anti-spam measures. Deployed on Railway with a persistent volume, verified end-to-end.',
+        'p2.title': 'Dice Pattern Recorder',
+        'p2.desc': 'An accessibility-first web app designed to be fully usable with a screen reader alone. It records dice-game sessions, aggregates the results, and turns the statistics into plain-language strategy suggestions instead of raw numbers — with natural-language input parsing powered by the Claude API, CSV/TXT export, and dual aria-live regions for non-visual feedback. Built with Next.js 16 + TypeScript and Prisma ORM on MySQL 8, deployed on Railway with GitHub auto-deploy.',
+        'p3.title': 'News Scraping Automation',
+        'p3.desc': 'A Flask web tool that eliminated a daily office chore: manually searching portal news and compiling Excel reports. It collects keyword-matched articles from the last 24 hours via RSS feeds and scraping, extracts clean article text, filters near-duplicates with text-similarity analysis, and outputs a formatted Excel file plus a ready-to-send work-report text. Covered by an automated test suite with CI, and used every day in a real office workflow.',
+        'p4.title': 'Work Task Scheduler',
+        'p4.desc': 'A personal scheduler that runs routine browser-based work tasks automatically at randomized times within configured windows — skipping weekends and Korean public holidays, with a master on/off switch and a web status dashboard. Flask and APScheduler drive Playwright browser automation, running 24/7 on Railway. Building it taught me how to make unattended automation resilient to timing, timezone and holiday edge cases.',
+        'link.site': 'Visit Live Site →', 'link.code': 'View Code on GitHub →',
+        'tag.internal': 'Internal tool — code private',
+        'contact.label': 'Contact', 'contact.title': 'Let\'s <span>Build Together</span>',
+        'contact.p': 'Open to project collaborations, idea sharing, or any questions. Feel free to reach out!',
+        'contact.email': 'Send me an email', 'contact.github': 'View GitHub profile',
+        'form.name': 'Name', 'form.name.ph': 'John Doe',
+        'form.email': 'Email',
+        'form.msg': 'Message', 'form.msg.ph': 'Hi, I\'d love to collaborate on a project...',
+        'form.send': 'Send Message ✉', 'form.sent': 'Message Sent! ✓',
+        'footer': '© 2026 Biju Cha. Made with <span>♥</span> and AI.',
+        'lang.name': 'English', 'lang.changed': 'Language changed to English.', 'lang.aria': 'Select language. Current: English',
+      }
+    };
+
+    let currentLang = 'ko';
+    let typingTimer = null;
+
+    /* ── 언어 적용 ── */
+    function applyLanguage(lang) {
+      const t = i18n[lang];
+      if (!t) return;
+      currentLang = lang;
+
+      document.documentElement.lang = lang;
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const v = t[el.dataset.i18n];
+        if (v !== undefined) el.textContent = v;
+      });
+
+      document.querySelectorAll('[data-i18n-html]').forEach(el => {
+        const v = t[el.dataset.i18nHtml];
+        if (v !== undefined) el.innerHTML = v;
+      });
+
+      document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+        const v = t[el.dataset.i18nPh];
+        if (v !== undefined) el.placeholder = v;
+      });
+
+      const langCurrent = document.querySelector('.lang-current');
+      if (langCurrent) langCurrent.textContent = t['lang.name'];
+
+      const langBtn = document.querySelector('.lang-btn');
+      if (langBtn) langBtn.setAttribute('aria-label', t['lang.aria']);
+
+      document.querySelectorAll('.lang-dropdown button').forEach(btn => {
+        const isActive = btn.dataset.lang === lang;
+        btn.classList.toggle('active', isActive);
+        btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+
+      const announcer = document.getElementById('lang-announcer');
+      if (announcer) {
+        announcer.textContent = '';
+        setTimeout(() => { announcer.textContent = t['lang.changed']; }, 60);
+      }
+
+      localStorage.setItem('portfolio-lang', lang);
+      restartTyping(t['hero.typing']);
+    }
+
+    /* ── 타이핑 효과 ── */
+    function restartTyping(texts) {
+      if (typingTimer) clearTimeout(typingTimer);
+      const el = document.getElementById('typing-title');
+      if (!el) return;
+      el.textContent = '';
+      let tIdx = 0, cIdx = 0, deleting = false;
+
+      function tick() {
+        const cur = texts[tIdx];
+        el.textContent = deleting ? cur.substring(0, cIdx - 1) : cur.substring(0, cIdx + 1);
+        deleting ? cIdx-- : cIdx++;
+
+        let delay = deleting ? 55 : 110;
+        if (!deleting && cIdx === cur.length) { delay = 1800; deleting = true; }
+        else if (deleting && cIdx === 0) { deleting = false; tIdx = (tIdx + 1) % texts.length; delay = 400; }
+        typingTimer = setTimeout(tick, delay);
+      }
+      tick();
+    }
+
+    /* ── 스크롤 등장 ── */
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          e.target.querySelectorAll('.progress-fill').forEach(bar => {
+            bar.style.width = bar.dataset.width + '%';
+          });
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    /* ── 폼 제출 ── */
+    function handleSubmit(e) {
+      e.preventDefault();
+      const btn = e.target.querySelector('.btn-send');
+      const t = i18n[currentLang] || i18n.ko;
+      btn.textContent = t['form.sent'];
+      btn.style.background = 'linear-gradient(135deg, #22c55e, #16a34a)';
+      setTimeout(() => {
+        btn.textContent = t['form.send'];
+        btn.style.background = '';
+        e.target.reset();
+      }, 3000);
+    }
+
+    /* ── 햄버거 메뉴 ── */
+    const hamburger = document.querySelector('.nav-hamburger');
+    const navMenu = document.querySelector('.nav-menu');
+
+    hamburger.addEventListener('click', () => {
+      const isOpen = navMenu.classList.toggle('open');
+      hamburger.classList.toggle('active', isOpen);
+      hamburger.setAttribute('aria-expanded', isOpen);
+      hamburger.setAttribute('aria-label', isOpen ? '메뉴 닫기' : '메뉴 열기');
+    });
+
+    navMenu.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        navMenu.classList.remove('open');
+        hamburger.classList.remove('active');
+        hamburger.setAttribute('aria-expanded', 'false');
+        hamburger.setAttribute('aria-label', '메뉴 열기');
+      });
+    });
+
+    /* ── 언어 드롭다운 ── */
+    const langBtn = document.querySelector('.lang-btn');
+    const langDropdown = document.querySelector('.lang-dropdown');
+
+    langBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = langDropdown.classList.toggle('open');
+      langBtn.setAttribute('aria-expanded', isOpen);
+    });
+
+    langDropdown.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        applyLanguage(btn.dataset.lang);
+        langDropdown.classList.remove('open');
+        langBtn.setAttribute('aria-expanded', 'false');
+        langBtn.focus();
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.lang-toggle')) {
+        langDropdown.classList.remove('open');
+        langBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && langDropdown.classList.contains('open')) {
+        langDropdown.classList.remove('open');
+        langBtn.setAttribute('aria-expanded', 'false');
+        langBtn.focus();
+      }
+    });
+
+    /* ── 키보드 방향키 탐색 ── */
+    langDropdown.addEventListener('keydown', (e) => {
+      const btns = [...langDropdown.querySelectorAll('button')];
+      const idx = btns.indexOf(document.activeElement);
+      if (e.key === 'ArrowDown') { e.preventDefault(); btns[(idx + 1) % btns.length].focus(); }
+      if (e.key === 'ArrowUp')   { e.preventDefault(); btns[(idx - 1 + btns.length) % btns.length].focus(); }
+    });
+
+    /* ── nav 활성 섹션 표시 ── */
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-menu a');
+
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(sec => {
+        if (window.scrollY >= sec.offsetTop - 100) current = sec.id;
+      });
+      navLinks.forEach(a => {
+        a.style.color = a.getAttribute('href') === '#' + current ? 'var(--accent2)' : '';
+      });
+    }, { passive: true });
+
+    /* ── 초기화 (저장값이 ko/en 외이면 ko로) ── */
+    const savedLang = localStorage.getItem('portfolio-lang');
+    applyLanguage(i18n[savedLang] ? savedLang : 'ko');
+  </script>
+
+</body>
+</html>
